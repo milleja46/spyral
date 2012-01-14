@@ -17,7 +17,7 @@ class Memoize(object):
             self.cache[args] = (res, frame)
             return res
         except TypeError:
-            print "WARNING: Unhashable type passed to memoize2. Reconsider using this decorator"
+            print("WARNING: Unhashable type passed to memoize2. Reconsider using this decorator")
             return self.func(*args)
 
 
@@ -40,10 +40,7 @@ class SmartMemoize(object):
             self.scene = director.get_scene()
             self.cache = {}
         if frame - self.last_clear > 100:
-            for key, value in self.cache.items():
-                data, oldframe = value
-                if frame - oldframe > 250:
-                    self.cache.pop(key)
+            self.cache = dict((key,value) for key,value in self.cache.items() if frame - value[1] > 250)
             self.last_clear = frame
         try:
             data, oldframe = self.cache[args]
@@ -54,5 +51,5 @@ class SmartMemoize(object):
             self.cache[args] = (res, frame)
             return res
         except TypeError:
-            print "WARNING: Unhashable type passed to memoize2. Reconsider using this decorator"
+            print("WARNING: Unhashable type passed to memoize2. Reconsider using this decorator")
             return self.func(*args)

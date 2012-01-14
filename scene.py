@@ -27,7 +27,7 @@ class Director(object):
            called per frame. This will remain the same, even if fps drops.
         """
         if self._initialized:
-            print 'Warning: Tried to initialize the director twice. Ignoring.'
+            print('Warning: Tried to initialize the director twice. Ignoring.')
         pygame.init()
         pygame.font.init()
 
@@ -132,7 +132,7 @@ class Director(object):
         """
         Runs the scene as dictated by the stack. Does not return.
         """
-        if self._stack > 0:
+        if len(self._stack) > 0:
             while True:
                 scene = self.get_scene()
                 clock = scene.clock

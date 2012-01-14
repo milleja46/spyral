@@ -223,8 +223,8 @@ if __name__ == "__main__":
     images['ball'] = spyral.util.new_surface(geom['ball'], geom['ball'])
     pygame.draw.circle(images['ball'],
                        colors['ball'],
-                       (geom['ball']/2, geom['ball']/2),
-                       int(geom['ball']/2),
+                       (geom['ball']//2, geom['ball']//2),
+                       (geom['ball']//2),
                        0)
     images['menu_title'] = fonts['menu_title'].render(
                             strings['menu_title'],

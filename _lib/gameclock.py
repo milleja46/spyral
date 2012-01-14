@@ -683,7 +683,7 @@ if __name__ == '__main__':
     sprite_group = None
     
     def logger(*args):
-        if logging: print ' '.join([str(a) for a in args])
+        if logging: print(' '.join([str(a) for a in args]))
     logging = True
     
     class Ball(pygame.sprite.Sprite):
