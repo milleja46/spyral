@@ -1,0 +1,190 @@
+From ca98c104b77a6c3f63ab7eb73f6b5c926599e458 Mon Sep 17 00:00:00 2001
+From: milleja46 <milleja46@gmail.com>
+Date: Sat, 14 Jan 2012 15:06:47 -0500
+Subject: [PATCH] changes to make it python 3 compliant
+
+---
+ _lib/gameclock.py |    2 +-
+ camera.py         |   10 +++++-----
+ examples/pong.py  |    6 +++---
+ memoize.py        |    9 +++------
+ point.py          |    4 ++--
+ scene.py          |    4 ++--
+ util.py           |   14 +++++++-------
+ 7 files changed, 23 insertions(+), 26 deletions(-)
+
+diff --git a/_lib/gameclock.py b/_lib/gameclock.py
+index bede76a..ec953ec 100644
+--- a/_lib/gameclock.py
++++ b/_lib/gameclock.py
+@@ -683,7 +683,7 @@ if __name__ == '__main__':
+     sprite_group = None
+     
+     def logger(*args):
+-        if logging: print ' '.join([str(a) for a in args])
++        if logging: print(' '.join([str(a) for a in args]))
+     logging = True
+     
+     class Ball(pygame.sprite.Sprite):
+diff --git a/camera.py b/camera.py
+index 4561a14..f6064e8 100644
+--- a/camera.py
++++ b/camera.py
+@@ -227,16 +227,16 @@ class Camera(object):
+         clear_next = self._clear_next_frame
+         update_this = []
+         screen_rect = screen.get_rect()
+-        s.sort(key=operator.itemgetter(2))
+-        blits.sort(key=operator.itemgetter(2))
++        sorted(list(s), key = operator.itemgetter(2))
++        sorted(list(blits), key=operator.itemgetter(2))
+         i = j = 0
+         drawn_static = 0
+         v = pygame.version.vernum
+         # Reminder: blits are (surf, pos, layer)
+-        for layer in xrange(-100, 20):
++        for layer in range(-100, 20):
+             if len(s) > 0:
+-                while i < len(s) and s[i][2] == layer:
+-                    surf, pos, layer, flags = s[i]
++                while i < len(list(s)) and list(s)[i][2] == layer:
++                    surf, pos, layer, flags = list(s)[i]
+                     # Now, does this need to be redrawn
+                     for rect in clear_this:
+                         if pos.colliderect(rect):
+diff --git a/examples/pong.py b/examples/pong.py
+index 83cbe64..2e7edfd 100755
+--- a/examples/pong.py
++++ b/examples/pong.py
+@@ -223,8 +223,8 @@ if __name__ == "__main__":
+     images['ball'] = spyral.util.new_surface(geom['ball'], geom['ball'])
+     pygame.draw.circle(images['ball'],
+                        colors['ball'],
+-                       (geom['ball']/2, geom['ball']/2),
+-                       int(geom['ball']/2),
++                       (geom['ball']//2, geom['ball']//2),
++                       (geom['ball']//2),
+                        0)
+     images['menu_title'] = fonts['menu_title'].render(
+                             strings['menu_title'],
+@@ -238,4 +238,4 @@ if __name__ == "__main__":
+     
+     spyral.director.init(geom['size'])
+     spyral.director.push(Menu())
+-    spyral.director.run()
+\ No newline at end of file
++    spyral.director.run()
+diff --git a/memoize.py b/memoize.py
+index b8d4b8e..8ac1061 100644
+--- a/memoize.py
++++ b/memoize.py
+@@ -17,7 +17,7 @@ class Memoize(object):
+             self.cache[args] = (res, frame)
+             return res
+         except TypeError:
+-            print "WARNING: Unhashable type passed to memoize2. Reconsider using this decorator"
++            print("WARNING: Unhashable type passed to memoize2. Reconsider using this decorator")
+             return self.func(*args)
+ 
+ 
+@@ -40,10 +40,7 @@ class SmartMemoize(object):
+             self.scene = director.get_scene()
+             self.cache = {}
+         if frame - self.last_clear > 100:
+-            for key, value in self.cache.items():
+-                data, oldframe = value
+-                if frame - oldframe > 250:
+-                    self.cache.pop(key)
++            self.cache = dict((key,value) for key,value in self.cache.items() if frame - value[1] > 250)
+             self.last_clear = frame
+         try:
+             data, oldframe = self.cache[args]
+@@ -54,5 +51,5 @@ class SmartMemoize(object):
+             self.cache[args] = (res, frame)
+             return res
+         except TypeError:
+-            print "WARNING: Unhashable type passed to memoize2. Reconsider using this decorator"
++            print("WARNING: Unhashable type passed to memoize2. Reconsider using this decorator")
+             return self.func(*args)
+diff --git a/point.py b/point.py
+index 4d18ce6..1816a33 100644
+--- a/point.py
++++ b/point.py
+@@ -40,7 +40,7 @@ def dist2(p1, p2):
+ def rotate(p, angle, center = (0,0)):
+     """ Rotates p around center by angle. """
+     (r, theta) = sub(p, center)
+-    print theta
++    print(theta)
+     theta += angle    
+     return add(rectangular(r, theta), center)
+     
+@@ -68,4 +68,4 @@ def bounding_rect(l):
+     y = [y[1] for y in l]
+     minx = max(0, min(x))
+     miny = max(0, min(y))
+-    return pygame.Rect(minx, miny, max(x)-minx, max(y)-miny)
+\ No newline at end of file
++    return pygame.Rect(minx, miny, max(x)-minx, max(y)-miny)
+diff --git a/scene.py b/scene.py
+index d4d17bb..2295cbb 100644
+--- a/scene.py
++++ b/scene.py
+@@ -27,7 +27,7 @@ class Director(object):
+            called per frame. This will remain the same, even if fps drops.
+         """
+         if self._initialized:
+-            print 'Warning: Tried to initialize the director twice. Ignoring.'
++            print('Warning: Tried to initialize the director twice. Ignoring.')
+         pygame.init()
+         pygame.font.init()
+ 
+@@ -132,7 +132,7 @@ class Director(object):
+         """
+         Runs the scene as dictated by the stack. Does not return.
+         """
+-        if self._stack > 0:
++        if len(self._stack) > 0:
+             while True:
+                 scene = self.get_scene()
+                 clock = scene.clock
+diff --git a/util.py b/util.py
+index 43759de..71fded9 100644
+--- a/util.py
++++ b/util.py
+@@ -17,9 +17,9 @@ def load_image(path, colorkey=None):
+     """
+     try:
+         image = pygame.image.load(path)
+-    except pygame.error, message:
+-        print "Cannot load image:", path
+-        raise SystemExit, message
++    except pygame.error as message:
++        print("Cannot load image:", path)
++        raise SystemExit(message)
+     if colorkey is not None:
+         if colorkey == -1:
+             colorkey = image.get_at((0,0))
+@@ -33,9 +33,9 @@ class Spritesheet(object):
+     def __init__(self, filename, colorkey=None):
+         try:
+             self.sheet = pygame.image.load(filename)
+-        except pygame.error, message:
+-            print 'Unable to load spritesheet image:', filename
+-            raise SystemExit, message
++        except pygame.error as message:
++            print('Unable to load spritesheet image:', filename)
++            raise SystemExit(message)
+     def image_at(self, rectangle, colorkey = None):
+         "Loads image from x,y,x+offset,y+offset"
+         rect = pygame.Rect(rectangle)
+@@ -59,4 +59,4 @@ class Spritesheet(object):
+                 for x in range(image_count)]
+         return self.images_at(tups, colorkey)
+     def unload(self):
+-        self.sheet= None;    
+\ No newline at end of file
++        self.sheet= None;    
+-- 
+1.7.6.msysgit.0
+
